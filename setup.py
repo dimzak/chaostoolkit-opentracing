@@ -50,8 +50,8 @@ with io.open('requirements.txt') as f:
 
 extra_requires = {
     "jaeger": [
-        "opentracing>=1.2.2,<2",
-        "jaeger-client==3.10.0"
+        "opentracing>=2.2.0",
+        "jaeger-client>=4"
     ]
 }
 
