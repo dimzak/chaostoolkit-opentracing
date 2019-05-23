@@ -35,15 +35,6 @@ def configure_control(configuration: Configuration = None,
         logger.debug("Unsupported tracer provider: {}".format('provider'))
         return
 
-    # this should not be needed if all providers supported OpenTracing 2 but
-    # this is not the case (notably Jaeger is lagging badly)
-    tracer = local.tracer
-    tracer.experiment_span = None
-    tracer.hypothesis_span = None
-    tracer.method_span = None
-    tracer.rollback_span = None
-    tracer.activity_span = None
-
 
 def cleanup_control():
     """
@@ -51,11 +42,6 @@ def cleanup_control():
     """
     tracer = local.tracer
     local.tracer = None
-    tracer.experiment_span = None
-    tracer.hypothesis_span = None
-    tracer.method_span = None
-    tracer.rollback_span = None
-    tracer.activity_span = None
 
     if hasattr(tracer, 'close'):
         time.sleep(0.2)
@@ -69,7 +55,7 @@ def before_experiment_control(context: Experiment, **kwargs):
     """
     tracer = local.tracer
     name = context.get("title")
-    span = tracer.start_span(name)
+    span = tracer.start_active_span(name, ignore_active_span=True).span
     tracer.experiment_span = span
 
     span.set_tag('type', 'experiment')
@@ -110,7 +96,7 @@ def before_hypothesis_control(context: Hypothesis, **kwargs):
     """
     tracer = local.tracer
     name = context.get("title")
-    span = tracer.start_span(name, child_of=tracer.experiment_span)
+    span = tracer.start_active_span(name).span
     tracer.hypothesis_span = span
     span.set_tag('type', 'hypothesis')
     if kwargs:
@@ -148,8 +134,7 @@ def before_method_control(context: Experiment, **kwargs):
     are applied
     """
     tracer = local.tracer
-    span = tracer.start_span(
-        "Method", child_of=tracer.experiment_span)
+    span = tracer.start_active_span("Method").span
     tracer.method_span = span
     span.set_tag('type', 'method')
     if kwargs:
@@ -172,8 +157,7 @@ def before_rollback_control(context: Experiment, **kwargs):
     activities are applied
     """
     tracer = local.tracer
-    span = tracer.start_span(
-        "Rollbacks", child_of=tracer.experiment_span)
+    span = tracer.start_active_span("Rollbacks").span
     tracer.rollback_span = span
     span.set_tag('type', 'rollback')
     if kwargs:
@@ -197,9 +181,7 @@ def before_activity_control(context: Activity, **kwargs):
     """
     tracer = local.tracer
     name = context.get("name")
-    parent_span = tracer.hypothesis_span or tracer.method_span or \
-        tracer.rollback_span or tracer.experiment_span
-    span = tracer.start_span(name, child_of=parent_span)
+    span = tracer.start_active_span(name).span
     tracer.activity_span = span
     span.set_tag('type', 'activity')
     span.set_tag('activity', context.get("type"))
