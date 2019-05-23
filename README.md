@@ -69,9 +69,8 @@ def some_function(...):
     opentracing.tracer
 ```
 
-As not all Open Tracing providers support yet to fetch the active span from
-the tracer (Open Tracing 2 specification), we attach the following attributes
-to the tracer instance:
+For extensions already implemented with `opentracing 1.x` version, tracer attributes
+are still left intact
 
 ```python
 tracer.experiment_span  # span during the lifetime of the experiment
@@ -92,8 +91,7 @@ def my_activity(...):
     headers = {}
 
     tracer = opentracing.tracer
-    parent_span = tracer.activity_span
-    span = tracer.start_span("my-inner-span", child_of=parent_span)
+    span = tracer.start_active_span("my-inner-span").span
     span.set_tag('http.method','GET')
     span.set_tag('http.url', url)
     span.set_tag('span.kind', 'client')
@@ -123,8 +121,6 @@ To install the necessary dependencies for the Jaeger tracer, please run:
 ```
 $ pip install chaostoolkit-opentracing[jaeger]
 ```
-
-Unfortunately, the Jaeger client does not yet support Open Tracing 2.0.
 
 
 ## Test
