@@ -29,7 +29,7 @@ def test_cleanup_control(configuration: Configuration):
 
 
 def test_before_experiment_control(tracer, experiment: Experiment):
-    assert tracer.experiment_span is None
+    assert not hasattr(tracer, "experiment_span")
     before_experiment_control(experiment)
     assert tracer.experiment_span is not None
 
@@ -42,7 +42,7 @@ def test_after_experiment_control(tracer, experiment: Experiment):
 
 
 def test_before_hypothesis_control(tracer, hypothesis: Hypothesis):
-    assert tracer.hypothesis_span is None
+    assert not hasattr(tracer, "hypothesis_span")
     before_hypothesis_control(hypothesis)
     assert tracer.hypothesis_span is not None
 
@@ -55,7 +55,7 @@ def test_after_hypothesis_control(tracer, hypothesis: Hypothesis):
 
 
 def test_before_method_control(tracer, experiment: Experiment):
-    assert tracer.method_span is None
+    assert not hasattr(tracer, "method_span")
     before_method_control(experiment)
     assert tracer.method_span is not None
 
@@ -68,7 +68,7 @@ def test_after_method_control(tracer, experiment: Experiment):
 
 
 def test_before_rollback_control(tracer, experiment: Experiment):
-    assert tracer.rollback_span is None
+    assert not hasattr(tracer, "rollback_span")
     before_rollback_control(experiment)
     assert tracer.rollback_span is not None
 
@@ -81,7 +81,7 @@ def test_after_method_control(tracer, experiment: Experiment):
 
 
 def test_before_activity_control(tracer, activity: Activity):
-    assert tracer.activity_span is None
+    assert not hasattr(tracer, "activity_span")
     before_activity_control(activity)
     assert tracer.activity_span is not None
 
